@@ -2,34 +2,40 @@ import processing.serial.*;
 Serial mySerial;
 PrintWriter output;
 
+
+//Definindo variáveis
 int numValues = 9;
 int paraquedas = 150;
-
 float[] values = new float[numValues];
 int[] min = new int[numValues];
 int[] max = new int[numValues];
 color[] valColor = new color[numValues];
-float partH;
+float h;
 int xPos = 0;
 boolean clearScreen = true; 
 
 
 void setup() {
+  //Criando janela
   size(800, 600);
-  partH = height / 10;
+  h = height / 10; //Critério utilizado para definir a artura de cada região
   
-
+  //Definindo serial
   printArray(Serial.list());
   String portName = Serial.list()[0];
   mySerial = new Serial(this, portName, 9600);
+  
+  //Criando arquivo txt
   output = createWriter( "data.txt" );
+  
   mySerial.bufferUntil(',');
 
+  //Tamanho dos textos, cor do plano de fundo e 
   textSize(10);
-
   background(0);
   noStroke();
  
+ //Definindo os intervalos máximos e mínimos de cada sensor e as cores de cada gráfico
   values[0] = 0;
   min[0] = 0;  
   max[0] = 1023; 
@@ -48,7 +54,7 @@ void setup() {
   values[3] = 0;
   min[3] = 0;
   max[3] = 1023; 
-  valColor[3] = color(100, 0, 255); 
+  valColor[3] = color(255, 165, 0); 
   
     
   values[4] = 0;
@@ -66,27 +72,27 @@ void setup() {
   values[6] = 0;
   min[6] = 0;
   max[6] = 1023; 
-  valColor[6] = color(25, 0, 55); 
+  valColor[6] = color(255, 255, 255); 
   
     
   values[7] = 0;
   min[7] = 0;
   max[7] = 1023; 
-  valColor[7] = color(55, 0, 25); 
+  valColor[7] = color(255, 255, 0); 
   
     
   values[8] = 0;
   min[8] = 0;
   max[8] = 1023; 
-  valColor[8] = color(140, 120, 255); 
+  valColor[8] = color(153, 51, 153); 
  
 }
 
-
+//Equivalente ao void loop
 void draw() 
 {
   
- 
+ //Desenho do botão
   fill(150,255,60);
   rect(300, 550,200 ,40);
   fill(0, 0, 0);
@@ -95,6 +101,7 @@ void draw()
   text("Paraquedas", 400, 570);
   
   
+  //Definindo o que seré printados no serial do arduino caso o botão seja pressionado
   if (mousePressed && mouseX > 300 && mouseX < 500 && mouseY > 550 && mouseY < 590)
   {
     if (paraquedas == 255)
@@ -108,11 +115,12 @@ void draw()
       fill(255,0,0);
       text("PARAQUEDAS ATIVADO", 600, 570);
     }
+    //Mudando cor do botão ao ser clicado
     fill(0,0,255);
     rect(300, 550,200 ,40);
   }
   
-  /*
+  //Salvando dados em arquivo .txt local
   if(mySerial.available() >= 0)
   {
      String valor = mySerial.readString();
@@ -121,35 +129,35 @@ void draw()
       output.println(valor);
      }
   }
-  */
   
-  
+  //"Limpa" a tela quando os gráficos atingem o final da tela
   if (clearScreen) 
   {
     background(0); 
-    clearScreen = false; // reset flag
+    clearScreen = false; 
   } 
+
 
   for (int i=0; i<numValues; i++) 
   {
-    float mapeado = map(values[i], min[i], max[i], 0, partH);
+    float mapeado = map(values[i], min[i], max[i], 0, h);
 
-    // draw lines:
+    //Desenha o gráfico
     stroke(valColor[i]);
-    line(xPos, partH*(i+1), xPos, partH*(i+1) - mapeado);
+    line(xPos, h*(i+1), xPos, h*(i+1) - mapeado);
 
-    // draw dividing line:
+    //Desenha linha de divisão
     stroke(255);
-    line(0, partH*(i+1), width, partH*(i+1));
+    line(0, h*(i+1), width, h*(i+1));
 
-    // display values on screen:
+    //Plota valores em tempo real
     fill(50);
     noStroke();
-    rect(0, partH*i+1, 70, 12);
+    rect(0, h*i+1, 70, 12);
     fill(255);
-    text(round(values[i]), 2, partH*i+10);
+    text(round(values[i]), 2, h*i+10);
     fill(125);
-    text(max[i], 40, partH*i+10);
+    text(max[i], 40, h*i+10);
   
     print(values[i] + ",");
   }
@@ -157,6 +165,7 @@ void draw()
   print("\n");
   xPos++; 
   
+  //Checa se os gráficos chegaram ao final da tela
   if (xPos > width) 
   {
     xPos = 0;
@@ -166,7 +175,7 @@ void draw()
    
 }
 
-
+//Função responsável por ler dados do serial
 void serialEvent(Serial mySerial) 
 { 
    
@@ -187,6 +196,7 @@ void serialEvent(Serial mySerial)
   }
 }
 
+//Função para identificar clique do mouse e alterar o valor da variável para que a mensagem seja enviada
 void mouseClicked() 
 {
   if (mouseX > 300 && mouseX > 500 && mouseY > 550 && mouseY < 590)
@@ -206,10 +216,10 @@ void mouseClicked()
 }
 
 
-
+//Comando para finalizar o programa e salvar dados no cartão SD
 void keyPressed() 
 {
-    output.flush();  // Writes the remaining data to the file
-    output.close();  // Finishes the file
-    exit();  // Stops the program
+    output.flush(); 
+    output.close(); 
+    exit();  
 }
