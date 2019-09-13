@@ -123,7 +123,7 @@ void draw()
   //Salvando dados em arquivo .txt local
   if(mySerial.available() >= 0)
   {
-     String valor = mySerial.readString();
+     String valor = mySerial.readStringUntil('\n');
      if(valor != null)
      {
       output.println(valor);
