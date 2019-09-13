@@ -83,7 +83,7 @@ void loop()
   GyY=Wire.read()<<8|Wire.read();  
   GyZ=Wire.read()<<8|Wire.read();
 
-  //recebendo altura relativa ao solo a partir do BMP
+  //recebendo e pressão(pres) altura relativa ao solo a partir do BMP
   char status;
   double T, P, alt, pres;
   status = bmp180.startTemperature();
@@ -170,7 +170,7 @@ void loop()
     Serial.println(text); 
   }
 
-
+  //enviando dados
   const char text[] = alt +"," + pres + "," + Tmp + "," + AcX + "," + AcY + "," + AcZ + "," + GyX + "," + GyY + "," + GyZ; 
   radio.write(&text); 
 
