@@ -1,10 +1,15 @@
 #include <SPI.h> 
-#include <nRF24L01.h> 
+#include <nRF24L01.h> //Biblioteca
 #include <RF24.h> 
 #include<Wire.h>
 #include <Servo.h>
-#include <SFE_BMP180.h>
+#include <SFE_BMP180.h> //Biblioteca do barômetro
+#include <SdFat.h> //Biblioteca do cartão SD
 
+SdFat sdCard;
+SdFile meuArquivo;
+
+const int chipSelect = CS;
 
 SFE_BMP180 bmp180;
 #define  SERVO 6 // Porta 6 PWM
@@ -14,19 +19,19 @@ float Po = //preencher com pressão do local de vôo;
 
 //definindo mpu
 const int MPU = 0x68;  
-float AcX,AcY,AcZ,Tmp,GyX,GyY,GyZ;
+float AcX,AcY,AcZ,Tmp,GyX,GyY,GyZ; // Variáveis para os dados do acelerômetro e do giroscópio
 
 
 RF24 radio(CE, CSN); //Transceptor
-const byte address[6] = "00002"; 
+const byte address[6] = "00002"; //Endereço de cabeçalho para comunicação
 
 RF24 radio(CE, CSN); //Receptor
 const byte address2[6] = "00003"; 
 
 void setup()
 {
-  radio.begin(); 
   Serial.begin(9600);
+  radio.begin(); 
   
   //Definindo transceptor
   radio.openWritingPipe(address); 
@@ -70,22 +75,22 @@ void loop()
   Wire.requestFrom(MPU,14,true);  
    
   //Dados do acelerômetro
-  AcX=Wire.read()<<8|Wire.read();  
-  AcY=Wire.read()<<8|Wire.read();  
-  AcZ=Wire.read()<<8|Wire.read();
+  AcX=Wire.read()<<8|Wire.read();  // Aceleração em X
+  AcY=Wire.read()<<8|Wire.read();  // Aceleração em Y
+  AcZ=Wire.read()<<8|Wire.read();  // Aceleração em Z
     
   //Temperatura em ºC
   Tmp=Wire.read()<<8|Wire.read();
-  Tmp = Tmp/340.00+36.53; //Conversão
+  Tmp = Tmp/340.00+36.53; //Conversão para ºC
   
   //Dados do giroscópio  
-  GyX=Wire.read()<<8|Wire.read();  
-  GyY=Wire.read()<<8|Wire.read();  
-  GyZ=Wire.read()<<8|Wire.read();
+  GyX=Wire.read()<<8|Wire.read();  // Inclinação em X
+  GyY=Wire.read()<<8|Wire.read();  // Inclinação em Y
+  GyZ=Wire.read()<<8|Wire.read();  // Inclinação em Z
 
   //recebendo e pressão(pres) altura relativa ao solo a partir do BMP
   char status;
-  double T, P, alt, pres;
+  double T, P, alt, pres; //Temperatura e pressão utilizadas para cálculo da altura, altura, pressão
   status = bmp180.startTemperature();
   if (status != 0) 
   {

@@ -4,15 +4,15 @@ PrintWriter output;
 
 
 //Definindo variáveis
-int numValues = 9;
-int paraquedas = 150;
-float[] values = new float[numValues];
-int[] min = new int[numValues];
-int[] max = new int[numValues];
-color[] valColor = new color[numValues];
-float h;
-int xPos = 0;
-boolean clearScreen = true; 
+int numValues = 9; //Quantidade de dados
+int paraquedas = 150; //Valor enviado pelo botão
+float[] values = new float[numValues]; //vetor de dados (values[0] = alt, values[1] = pres, ... , values[8] = aGyZ)
+int[] min = new int[numValues]; //minímo local de cada dado
+int[] max = new int[numValues]; //máximo local de cada dado
+color[] valColor = new color[numValues]; // cor de cada gráfico
+float h; 
+int xPos = 0; //posição inicial
+boolean clearScreen = true; //booleana para indiar se a tela precisa ser limpa
 
 
 void setup() {
@@ -140,6 +140,7 @@ void draw()
 
   for (int i=0; i<numValues; i++) 
   {
+    //Mapeando onde o dado será printado
     float mapeado = map(values[i], min[i], max[i], 0, h);
 
     //Desenha o gráfico
